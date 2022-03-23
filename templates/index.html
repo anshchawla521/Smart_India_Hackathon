@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>hello</h1>
-</body>
-</html>
+{%extends "layout.html" %}
+
+
+{% block sub_content %}
+    <h1>Hello and Welcome to our portal</h1>
+    <a class="btn btn-primary" href="/register_user" role="button">Register User</a>
+    <a class="btn btn-primary" href = '/login_user' role="button">User Login</a>
+    <a class="btn btn-danger" href = '/login_admin' role="button">Admin Login</a>
+    <a class="btn btn-danger" href = '/register_admin' role="button">Admin Registeration</a>
+    <a class="btn btn-success" href = '/register_hospital' role="button">Hospital Registration</a>
+    <a class="btn btn-success" href = '/login_hospital' role="button">Hospital Login</a>
+{% endblock %}

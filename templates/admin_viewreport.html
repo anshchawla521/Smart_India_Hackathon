@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block sub_content %}
+  {% if complains %}
+    {% for complain in complains %}
+    <h4>{{complain['complain']}}</h4>
+      <h5> by {{complain['name']}}</h5>
+
+      <hr>
+    {% endfor %}
+  {% else %}
+    <h3>No blogs have been written yet</h3>
+  {% endif %}
+{% endblock %}
