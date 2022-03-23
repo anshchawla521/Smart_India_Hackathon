@@ -5,7 +5,6 @@
 > Note : It is recommended to setup a virtual environment and then run the program
 
 ```bash
-pip install virtualenv #Installing Venv
 py -m pip venv ./venv  #creating virtual environment
 venv\Scripts\activate  #to activate the environment after creation
 ```
