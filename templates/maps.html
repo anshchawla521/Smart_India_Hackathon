@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>User</title>
+
+    <link rel="stylesheet" type="text/css" href="../static/maps.css" />
+    <script src="./index.js"></script>
+  </head>
+  <body>
+    <h3>My Location</h3>
+    <!--The div element for the map -->
+    <div id="map"></div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBfaeKfwKKixudSTFGR1S79V1o4zSFFRU&callback=initMap&v=weekly"
+      async
+    ></script>
+    <script src="../static/maps.js"></script>
+
+  </body>
+</html>

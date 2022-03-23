@@ -5,14 +5,16 @@
     <ul class="nav navbar-nav">
       <li><a href="/">Home</a></li>
       <!--here we are checking is user logged in--> 
-      {% if session.login %} 
       <li><a href="/admin">Admin View</a></li>
-      <li><a href="/User">User View</a></li>
-      {% endif %}
-      <li><a href="/Hospital">Hospital View</a></li>
-    </ul>
-    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/user">User View</a></li>
+      <li><a href="/hospital">Hospital View</a></li>     
+    
+      <li><a href="/add_experience">Add your Experience</a></li>
+      <li><a href="/user_addreport">Add your Complaint</a></li>
       {% if session.login %}
+      
+      <li><a href="/view_experience">View Experiences</a></li>
+      <li><a href="/admin_viewreport">View Complaints</a></li></li>
       <li>
         <a href="/logout">Logout</a>
       </li>
@@ -24,6 +26,6 @@
       <li>
         <a href="/register">Register</a>
       </li>
-      {% endif %}
-    </ul>
-</nav>
+        {% endif %}
+      </ul>
+  </nav>

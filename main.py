@@ -1,3 +1,4 @@
+from sre_constants import SUCCESS
 import flask
 from flask import Flask, render_template, request, redirect, session, flash
 from flask_bootstrap import Bootstrap
@@ -19,15 +20,91 @@ mysql = MySQL(app)
 
 app.config['SECRET_KEY'] = 'secret'
 
+def is_logged_in(**kwargs):
+    try: 
+        #check if defined
+        session['login']
+    except Exception:
+        session['login'] = False
+    try: 
+        #check if defined
+        session['type']
+    except Exception:
+        session['type'] = 'xyz'
+
+        
+    if session['login']  :
+        for type in kwargs['type']:
+            if session['type'] == type:
+                if 'if_logged_in_link' in kwargs :
+                    return redirect(kwargs['if_logged_in_link'])
+                    
+                else :
+                    
+                    return True
+            
+        flash("You dont have permissions" , 'danger') 
+        print(kwargs['type'] , "this type sent",session['type']) 
+              
+        return redirect('/')         
+    elif 'if_not_logged_in_link' in kwargs:
+        
+        return redirect(kwargs['if_not_logged_in_link'])
+        
+    else:
+        
+        return True
+
+
 # home page 
 @app.route('/')
 def index():
+    # session['login'] = False
     return render_template('index.html')
 
+@app.route('/logout')
+def logout():
+    session['login'] = False
+    flash('Logged Out Successfully', 'success')
+    return redirect('/')
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
+#user as per primary/ unique key- a part of route
+##take input as pincode
+#check 100 ki range mein +-10
+@app.route('/user',  methods=['GET', 'POST'])
+def explore_hospitals_nearby():
+    redirect_to = is_logged_in(type = ['user'], if_not_logged_in_link = '/login_user/')
+    if  redirect_to != True:
+        return redirect_to
+    return render_template('maps.html')
+    pass
+#     if request.method == 'POST':
+#             pincode = request.form
+            
+#             if hospitalDetails == None:
+#                   flash('Please Enter valid hospital details.')
+#                   return redirect('back')
+#             cur = mysql.connection.cursor()
+#             cur.execute("SELECT * FROM hospital WHERE pincode=' '") # check if this needs to have %s
+#             cur.close()
+
+@app.route('/hospital', methods=['GET','POST'])
+def hospital_main_page():
+    return ("under development")
+    pass
+
+    
 # login and register pages for admin , user , hospital
 @app.route('/register_admin/', methods=['GET', 'POST'])
 def register_admin():
+    redirect_to = is_logged_in(type = ['user' , 'admin' , 'hospital'] ,if_logged_in_link = '/admin/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         if userDetails['password'] != userDetails['confirm_password']:
@@ -44,8 +121,9 @@ def register_admin():
 
 @app.route('/login_admin/', methods=['GET', 'POST'])
 def login_admin():
-    if session['login'] :
-        return redirect('/admin')
+    redirect_to = is_logged_in(type = ['user' , 'admin' , 'hospital'] ,if_logged_in_link = '/admin/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         username = userDetails['name']
@@ -55,8 +133,9 @@ def login_admin():
             user = cur.fetchone()
             if userDetails['password'] == user['password']:
                 session['login'] = True
-                session['admin_Name'] = user['name']
-                flash('Welcome ' + session['admin_Name'] +'! You have been successfully logged in', 'success')
+                session['type'] = 'admin'
+                session['Name'] = user['name']
+                flash('Welcome ' + session['Name'] +'! You have been successfully logged in', 'success')
             else:
                 cur.close()
                 flash('Password does not match', 'danger')
@@ -72,14 +151,18 @@ def login_admin():
 
 @app.route('/register_user/', methods=['GET', 'POST'])
 def register_user():
+    redirect_to = is_logged_in(type = ['user' , 'admin' , 'hospital'],if_logged_in_link = '/user/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         if userDetails['password'] != userDetails['confirm_password']:
             flash('Passwords do not match! Try again.', 'danger')
             return render_template('register_user.html')
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO user(name,password) "\
-        "VALUES(%s,%s)",(userDetails['name'], userDetails['password']))
+        cur.execute("INSERT INTO user(name,password,adhar_number) "\
+        #aaded primary key- aadhar number
+        "VALUES(%s,%s,%s)",(userDetails['name'], userDetails['password'], userDetails['adhar_number']))
         mysql.connection.commit()
         cur.close()
         flash('Registration successful! Please login.', 'success')
@@ -88,6 +171,9 @@ def register_user():
 
 @app.route('/login_user/', methods=['GET', 'POST'])
 def login_user():
+    redirect_to = is_logged_in(type = ['user' , 'admin' , 'hospital'],if_logged_in_link = '/user/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         username = userDetails['name']
@@ -97,8 +183,9 @@ def login_user():
             user = cur.fetchone()
             if userDetails['password'] == user['password']:
                 session['login'] = True
-                session['user_Name'] = user['name']
-                flash('Welcome ' + session['user_Name'] +'! You have been successfully logged in', 'success')
+                session['type'] = 'user'
+                session['Name']= user['name']
+                flash('Welcome ' + session['Name'] +'! You have been successfully logged in', 'success')
             else:
                 cur.close()
                 flash('Password does not match', 'danger')
@@ -108,12 +195,15 @@ def login_user():
             flash('User not found', 'danger')
             return render_template('login_user.html')
         cur.close()
-        return redirect('/')
+        return redirect('/user')
     return render_template('login_user.html')
 
 
 @app.route('/register_hospital/', methods=['GET', 'POST'])
 def register_hospital():
+    redirect_to = is_logged_in(type = ['user' , 'admin' , 'hospital'],if_logged_in_link = '/hospital/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         if userDetails['password'] != userDetails['confirm_password']:
@@ -122,14 +212,23 @@ def register_hospital():
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO hospital(name,password,licence_no) "\
         "VALUES(%s,%s,%s)",(userDetails['name'], userDetails['password'],userDetails['licence_no']))
+        
+        
+        # creating the particular hospital's database when hospital registers itself.
+
+        cur.execute("CREATE TABLE {0} (equipment_name Varchar(50), price INT);".format(userDetails['name']))
         mysql.connection.commit()
         cur.close()
+
         flash('Registration successful! Please login.', 'success')
         return redirect('/login_hospital')
     return render_template('register_hospital.html')
 
 @app.route('/login_hospital/', methods=['GET', 'POST'])
 def login_hospital():
+    redirect_to = is_logged_in( type = ['user' , 'admin' , 'hospital'],if_logged_in_link = '/hospital/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         username = userDetails['name']
@@ -139,8 +238,9 @@ def login_hospital():
             user = cur.fetchone()
             if userDetails['password'] == user['password']:
                 session['login'] = True
-                session['hospital_Name'] = user['name']
-                flash('Welcome ' + session['hospital_Name'] +'! You have been successfully logged in', 'success')
+                session['type'] = 'hospital'
+                session['Name'] = user['name']
+                flash('Welcome ' + session['Name'] +'! You have been successfully logged in', 'success')
             else:
                 cur.close()
                 flash('Password does not match', 'danger')
@@ -157,12 +257,15 @@ def login_hospital():
 
 @app.route('/admin/', methods=['GET', 'POST'])
 def admin():
-    
+    redirect_to = is_logged_in(type = ['admin'] ,if_not_logged_in_link = '/login_admin/')
+    if  redirect_to != True:
+        return redirect_to
     return render_template('admin.html')
 
 # pages for admin_addprice disease , equipmennts , medicine
 @app.route('/admin_addprice_disease/', methods=['GET', 'POST'])
 def admin_addprice_disease():
+    is_logged_in(type = ['admin'],if_not_logged_in_link = '/login_admin/')
     if request.method == 'POST':
         userDetails = request.form
         cur = mysql.connection.cursor()
@@ -176,6 +279,9 @@ def admin_addprice_disease():
 
 @app.route('/admin_addprice_equipment/', methods=['GET', 'POST'])
 def admin_addprice_equipment():
+    redirect_to = is_logged_in(type = ['admin'] , if_not_logged_in_link = '/login_admin/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         cur = mysql.connection.cursor()
@@ -189,6 +295,9 @@ def admin_addprice_equipment():
 
 @app.route('/admin_addprice_medicine/', methods=['GET', 'POST'])
 def admin_addprice_medicine():
+    redirect_to = is_logged_in(type = ['admin'],if_not_logged_in_link = '/login_admin/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         cur = mysql.connection.cursor()
@@ -203,6 +312,9 @@ def admin_addprice_medicine():
 
 @app.route('/user_addreport/', methods=['GET', 'POST'])
 def user_addreport():
+    redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login_user/')
+    if  redirect_to != True:
+        return redirect_to
     if request.method == 'POST':
         userDetails = request.form
         print(userDetails['date'])
@@ -217,7 +329,9 @@ def user_addreport():
 
 @app.route('/admin_viewreport/', methods=['GET', 'POST'])
 def admin_viewreport():
-    
+    redirect_to = is_logged_in(type = ['user','admin','hospital'] ,if_not_logged_in_link = '/login_admin/')
+    if  redirect_to != True:
+        return redirect_to
     cur = mysql.connection.cursor()
     resultValue = cur.execute("SELECT * FROM complain")
     if resultValue > 0:
@@ -227,6 +341,37 @@ def admin_viewreport():
     cur.close()
     return render_template('admin_viewreport.html',compalins=None)
     
+
+# create expereince database    
+
+@app.route('/add_experience/', methods=['GET', 'POST'])
+def add_experience():
+    redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login/')
+    if  redirect_to != True:
+        return redirect_to
+    if request.method == 'POST':
+        userDetails = request.form
+        print(userDetails['date'])
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO experience(experience, name, date) "\
+        "VALUES(%s,%s,%s)",(userDetails['experience'], userDetails['name'], userDetails['date']))
+        mysql.connection.commit()
+        cur.close()
+        flash('Your Experience Registered', 'success')
+        return redirect('back')   #user's personal landing page
+    return render_template('add_experience.html')
+
+
+@app.route('/view_experience/', methods=['GET', 'POST'])
+def view_experience():
+    cur = mysql.connection.cursor()
+    resultValue = cur.execute("SELECT * FROM experience")
+    if resultValue > 0:
+        complains = cur.fetchall()
+        cur.close()
+        return render_template('view_experience.html', experience=experience)
+    cur.close()
+    return render_template('view_experience.html', experience=None)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
