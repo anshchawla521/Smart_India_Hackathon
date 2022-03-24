@@ -72,6 +72,11 @@ def logout():
 def login():
     return render_template('login.html')
 
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+
 
 #user as per primary/ unique key- a part of route
 ##take input as pincode
@@ -103,9 +108,12 @@ def admin():
     return render_template('admin.html')
 
 
-@app.route('/hospital', methods=['GET','POST'])
+@app.route('/hospital/', methods=['GET','POST'])
 def hospital_main_page():
-    return ("under development")
+    redirect_to = is_logged_in(type = ['hospital'], if_not_logged_in_link = '/login_hospital/')
+    if  redirect_to != True:
+        return redirect_to
+    return render_template('hospital.html')
     pass
 
     
@@ -226,7 +234,7 @@ def register_hospital():
         
         # creating the particular hospital's database when hospital registers itself.
 
-        cur.execute("CREATE TABLE {0} (equipment_name Varchar(50), price INT);".format(userDetails['name']))
+        cur.execute("CREATE TABLE {0} (equipment_name Varchar(50), price INT, count INT);".format(userDetails['name']))
         mysql.connection.commit()
         cur.close()
 
@@ -312,6 +320,38 @@ def admin_addprice_medicine():
         return redirect('/admin')
     return render_template('admin_addprice_medicine.html')
 
+######### check if i entered correct database
+@app.route('/hospital_addprice_disease/', methods=['GET', 'POST'])
+def hospital_addprice_disease():
+    is_logged_in(type = ['hospital'],if_not_logged_in_link = '/login_hospital/')
+    if request.method == 'POST':
+        userDetails = request.form
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO disease_gov(name,min_price,max_price,days_recover) "\
+        "VALUES(%s,%s,%s,%s)",(userDetails['name'], userDetails['min_price'], userDetails['max_price'], userDetails['days_recover']))
+        mysql.connection.commit()
+        cur.close()
+        flash('Data added to the database', 'success')
+        return redirect('/hospital')
+    return render_template('hospital_addprice_disease.html')
+
+
+@app.route('/hospital_addprice_medicine/', methods=['GET', 'POST'])
+def hospital_addprice_medicine():
+    redirect_to = is_logged_in(type = ['hospital'],if_not_logged_in_link = '/login_hospital/')
+    if  redirect_to != True:
+        return redirect_to
+    if request.method == 'POST':
+        userDetails = request.form
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO medicine_gov(name,min_price,max_price) "\
+        "VALUES(%s,%s,%s)",(userDetails['name'], userDetails['min_price'], userDetails['max_price']))
+        mysql.connection.commit()
+        cur.close()
+        flash('Data added to the database', 'success')
+        return redirect('/hospital')
+    return render_template('hospital_addprice_medicine.html')
+
 
 # user add report and admin view report
 
@@ -342,9 +382,9 @@ def admin_viewreport():
     if resultValue > 0:
         complains = cur.fetchall()
         cur.close()
-        return render_template('admin_viewreport.html', complains=complains)
+        return render_template('admin_viewreport.html', complains=complains , session = session)
     cur.close()
-    return render_template('admin_viewreport.html',compalins=None)
+    return render_template('admin_viewreport.html',compalins=None , session = session)
     
 
 # add and view experience    
@@ -363,7 +403,7 @@ def add_experience():
         mysql.connection.commit()
         cur.close()
         flash('Your Experience Registered', 'success')
-        return redirect('back')   #user's personal landing page
+        return redirect('/view_experience')   #user's personal landing page
     return render_template('add_experience.html')
 
 
@@ -418,6 +458,40 @@ def search_equipment():
         cur.close()
     return render_template('search_equipment.html',data=None)
 
+@app.route('/hospital_addprice_equipment/', methods=['GET', 'POST'])
+def hospital_addprice_equipment():
+    redirect_to = is_logged_in(type = ['hospital'] , if_not_logged_in_link = '/login_hospital/')
+    if  redirect_to != True:
+        return redirect_to
+    if request.method == 'POST':
+        userDetails = request.form
+        cur = mysql.connection.cursor()
+        hospital_name = session['Name']
+        cur.execute(f"INSERT INTO {hospital_name} (price,equipment_name,count) "\
+        "VALUES(%s,%s,%s)",(userDetails['price'], userDetails['name'] ,userDetails['count']))
+        mysql.connection.commit()
+        cur.close()
+        flash('Data added to the database', 'success')
+        return redirect('/hospital')
+    return render_template('hospital_addprice_equipment.html')
+
+@app.route('/hospital_update_count_equipments/', methods=['GET', 'POST'])
+def hospital_update_count():
+    redirect_to = is_logged_in(type = ['hospital'] , if_not_logged_in_link = '/login_hospital/')
+    if  redirect_to != True:
+        return redirect_to
+    if request.method == 'POST':
+        userDetails = request.form
+        hospital_name = session['Name']
+        cur = mysql.connection.cursor()
+        cur.execute(f"UPDATE {hospital_name} SET count = '{userDetails['count']}' WHERE equipment_name = '{userDetails['name']}' ")
+        cur.execute(f"UPDATE {hospital_name} SET price = '{userDetails['price']}' WHERE equipment_name = '{userDetails['name']}' ")
+        mysql.connection.commit()
+        cur.close()
+        flash('Data updated to the database', 'success')
+        return redirect('/hospital')
+    return render_template('hospital_update_count_equipment.html')
+
 @app.route('/search_medicine/', methods=['GET', 'POST'])
 def search_medicine():
     redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login/')
@@ -433,6 +507,7 @@ def search_medicine():
             cur.close()
             return render_template('search_medicine.html', data=data)
         cur.close()
+    flash('No such medicine','danger')     
     return render_template('search_medicine.html',data=None)
 
 

@@ -5,9 +5,15 @@
     <ul class="nav navbar-nav">
       <li><a href="/">Home</a></li>
       <!--here we are checking is user logged in--> 
+      {% if session.type == 'admin' or not session.login %}
       <li><a href="/admin">Admin View</a></li>
+      {% endif %}
+      {% if session.type == 'user' or not session.login %}
       <li><a href="/user">User View</a></li>
-      <li><a href="/hospital">Hospital View</a></li>     
+      {% endif %}
+      {% if session.type == 'hospital' or not session.login %}
+      <li><a href="/hospital">Hospital View</a></li>   
+      {% endif %}  
     
       <li><a href="/add_experience">Add your Experience</a></li>
       <li><a href="/user_addreport">Add your Complaint</a></li>

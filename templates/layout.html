@@ -14,22 +14,11 @@ Surgery portal
 {% endblock %}
 
 {% block content %}
-<script>
-  var x = document.getElementById("demo");
-  function getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition);
-    } else {
-      x.innerHTML = "Geolocation is not supported by this browser.";
-    }
-  }
-  
-  function showPosition(position) {
-    x.innerHTML = "Latitude: " + position.coords.latitude +
-    "<br>Longitude: " + position.coords.longitude;
-  }
-  </script>
+
   {% include "_messages.html" %}
   {% block sub_content %}
   {% endblock %}
+</br>
+  <!--adding footer-->
+  {% include "_footer.html"%}
 {% endblock %}

@@ -2,13 +2,33 @@
 
 
 {% block sub_content %}
-    <h1>Hello and Welcome to our portal</h1>
-    <a class="btn btn-primary" href="/register_user" role="button">Register User</a>
-    <a class="btn btn-primary" href = '/login_user' role="button">User Login</a>
-</br>
-    <a class="btn btn-danger" href = '/login_admin' role="button">Admin Login</a>
-    <a class="btn btn-danger" href = '/register_admin' role="button">Admin Registeration</a>
-</br>
-    <a class="btn btn-success" href = '/register_hospital' role="button">Hospital Registration</a>
-    <a class="btn btn-success" href = '/login_hospital' role="button">Hospital Login</a>
+  
+    <div class="btn-group" style="width:100%;display:block ; margin-top : 8px ;margin-left: auto ; margin-right: auto;">
+        
+        <a href="/register_user" > <button style="width:15% ; background-color : #007bff ;color: white; border-color: #007bff;border-radius: 4px; border-style: solid;" >Register User</button> </a>
+        <a href="/login_user"> <button style="width:15% ; background-color: #007bff ;color: white; border-color: #007bff;border-radius: 4px;  border-style: solid;">User Login</button> </a>
+        <a href="/login_admin"><button style="width:15% ; background-color: #dc3545 ;color: white;border-color:#dc3545 ;border-radius: 4px;  border-style: solid;">Admin Login</button> </a>
+        <a href="/register_admin"> <button style="width:15% ; background-color: #dc3545 ;color: white; border-color: #dc3545; border-radius: 4px;  border-style: solid;">Admin Registeration</button> </a>
+        <a href="/register_hospital"> <button style="width:15% ; background-color: #28a745 ;color: white; border-color: #28a745 ;border-radius: 4px; border-style: solid;">Hospital Registeration</button> </a>
+        <a href="/login_hospital"> <button style="width:15% ; background-color: #28a745 ;color: white; border-color: #28a745; border-radius: 4px; border-style: solid;">Hospital Login</button> </a>
+    </div>
+    <div>
+        <!--<img src="{{url_for('static', filename='MD.png')}}">--> 
+        <img src="https://media.istockphoto.com/photos/together-we-save-more-lives-than-we-would-individually-picture-id1152347304?k=20&m=1152347304&s=612x612&w=0&h=Xlz-5Qw4RRCor_lp71rxJuK9iTcOKouLWZlk_2GDgEc=" alt="docs" style="display:block ; margin-top : 8px ;margin-left: auto ; margin-right: auto;width:70%;min-height:350px;max-height:1000px;">
+    </div>
+    <div id="about">
+        <h3 class="display-3">About Us</h3>
+        <p class="lead">
+            At the time of clearing the bills, the private hospitals  may overcharge for the items like medicines and equipments.
+Certain equipments which are commonly used and  come under basic necessities may be overcharged during times of crises and pandemic. The proposed solution provides user with the details of such equipments as well as the location of hospital they are available and is nearest to them for instance beds or oxygen cylinders etc.
+Compare prices of hospital equipments to the government equipments as well as other hospitals so user may decide the hospital according to his budget.
+Hospitals may increase the duration of stay in hospital to get profits. Thus, user can get an idea of the number of days the stay should be depending upon the disease being cured.
+User can register a complaint against a hospital with valid proofs in case of overcharging.
+The idea that exploitation of people takes places due to lack of access to information. We are solving this problem.
+
+        </p>
+        </div>
+    <div id="contactUs">
+
+    </div>
 {% endblock %}

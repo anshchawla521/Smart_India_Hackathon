@@ -3,8 +3,9 @@
   {% if complains %}
     {% for complain in complains %}
     <h4>{{complain['complain']}}</h4>
+    {% if session['type'] == 'admin' %}
       <h5> by {{complain['name']}}</h5>
-
+    {% endif %}
       <hr>
     {% endfor %}
   {% else %}
