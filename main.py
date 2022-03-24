@@ -76,12 +76,12 @@ def login():
 #user as per primary/ unique key- a part of route
 ##take input as pincode
 #check 100 ki range mein +-10
-@app.route('/user',  methods=['GET', 'POST'])
+@app.route('/user/',  methods=['GET', 'POST'])
 def explore_hospitals_nearby():
     redirect_to = is_logged_in(type = ['user'], if_not_logged_in_link = '/login_user/')
     if  redirect_to != True:
         return redirect_to
-    return render_template('maps.html')
+    return render_template('user.html')
     pass
 #     if request.method == 'POST':
 #             pincode = request.form
@@ -92,6 +92,16 @@ def explore_hospitals_nearby():
 #             cur = mysql.connection.cursor()
 #             cur.execute("SELECT * FROM hospital WHERE pincode=' '") # check if this needs to have %s
 #             cur.close()
+
+# admin page 
+
+@app.route('/admin/', methods=['GET', 'POST'])
+def admin():
+    redirect_to = is_logged_in(type = ['admin'] ,if_not_logged_in_link = '/login_admin/')
+    if  redirect_to != True:
+        return redirect_to
+    return render_template('admin.html')
+
 
 @app.route('/hospital', methods=['GET','POST'])
 def hospital_main_page():
@@ -253,14 +263,7 @@ def login_hospital():
         return redirect('/')
     return render_template('login_hospital.html')
 
-# admin page 
 
-@app.route('/admin/', methods=['GET', 'POST'])
-def admin():
-    redirect_to = is_logged_in(type = ['admin'] ,if_not_logged_in_link = '/login_admin/')
-    if  redirect_to != True:
-        return redirect_to
-    return render_template('admin.html')
 
 # pages for admin_addprice disease , equipmennts , medicine
 @app.route('/admin_addprice_disease/', methods=['GET', 'POST'])
@@ -310,6 +313,8 @@ def admin_addprice_medicine():
     return render_template('admin_addprice_medicine.html')
 
 
+# user add report and admin view report
+
 @app.route('/user_addreport/', methods=['GET', 'POST'])
 def user_addreport():
     redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login_user/')
@@ -342,11 +347,11 @@ def admin_viewreport():
     return render_template('admin_viewreport.html',compalins=None)
     
 
-# create expereince database    
+# add and view experience    
 
 @app.route('/add_experience/', methods=['GET', 'POST'])
 def add_experience():
-    redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login/')
+    redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login_user/')
     if  redirect_to != True:
         return redirect_to
     if request.method == 'POST':
@@ -367,11 +372,32 @@ def view_experience():
     cur = mysql.connection.cursor()
     resultValue = cur.execute("SELECT * FROM experience")
     if resultValue > 0:
-        complains = cur.fetchall()
+        experience = cur.fetchall()
         cur.close()
         return render_template('view_experience.html', experience=experience)
     cur.close()
     return render_template('view_experience.html', experience=None)
+
+@app.route('/user_find_hospital/', methods=['GET', 'POST'])
+def user_find_hospital():
+    return render_template('maps.html')
+
+@app.route('/search_disease/', methods=['GET', 'POST'])
+def search_disease():
+    redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login/')
+    if  redirect_to != True:
+        return redirect_to
+    if request.method == 'POST':
+        userDetails = request.form
+        disease=userDetails['disease']
+        cur = mysql.connection.cursor()
+        resultValue = cur.execute("SELECT * FROM disease_gov where name=%s",([disease]))
+        if resultValue > 0:
+            data = cur.fetchall()
+            cur.close()
+            return render_template('search_disease.html', data=data)
+        cur.close()
+    return render_template('search_disease.html',data=None)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block sub_content %}
+  {% if experience %}
+    {% for e in experience %}
+    <h4>{{e['experience']}}</h4>
+      <h5> by {{e['name']}}</h5>
+
+      <hr>
+    {% endfor %}
+  {% else %}
+    <h3>No experience have been written yet</h3>
+  {% endif %}
+{% endblock %}
