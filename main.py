@@ -382,6 +382,8 @@ def view_experience():
 def user_find_hospital():
     return render_template('maps.html')
 
+# to search price for disease , equipments , medicine
+
 @app.route('/search_disease/', methods=['GET', 'POST'])
 def search_disease():
     redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login/')
@@ -398,6 +400,41 @@ def search_disease():
             return render_template('search_disease.html', data=data)
         cur.close()
     return render_template('search_disease.html',data=None)
+
+@app.route('/search_equipment/', methods=['GET', 'POST'])
+def search_equipment():
+    redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login/')
+    if  redirect_to != True:
+        return redirect_to
+    if request.method == 'POST':
+        userDetails = request.form
+        equipment=userDetails['equipment']
+        cur = mysql.connection.cursor()
+        resultValue = cur.execute("SELECT * FROM equipment_gov where name=%s",([equipment]))
+        if resultValue > 0:
+            data = cur.fetchall()
+            cur.close()
+            return render_template('search_equipment.html', data=data)
+        cur.close()
+    return render_template('search_equipment.html',data=None)
+
+@app.route('/search_medicine/', methods=['GET', 'POST'])
+def search_medicine():
+    redirect_to = is_logged_in(type = ['user'],if_not_logged_in_link = '/login/')
+    if  redirect_to != True:
+        return redirect_to
+    if request.method == 'POST':
+        userDetails = request.form
+        medicine=userDetails['medicine']
+        cur = mysql.connection.cursor()
+        resultValue = cur.execute("SELECT * FROM medicine_gov where name=%s",([medicine]))
+        if resultValue > 0:
+            data = cur.fetchall()
+            cur.close()
+            return render_template('search_medicine.html', data=data)
+        cur.close()
+    return render_template('search_medicine.html',data=None)
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

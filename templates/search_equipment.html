@@ -1,0 +1,33 @@
+
+
+{% block sub_content %}
+<div class="text-center">
+  <h1> SEARCH EQUIPMENT </h1>
+</div>
+<form class="form-horizontal" method="POST">
+
+  <div class="form-group">
+    <label class="control-label col-sm-2">Enter equipment</label>
+    <div class="col-sm-5">
+      <input type="text" name="equipment"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="Submit" >Submit </button>
+    </div>
+  </div>
+
+  {% if data %}
+    {% for d in data %}
+    <h4> EQUIPMENT NAME - {{d['name']}}</h4>
+      <h5> MIN PRICE {{d['min_price']}}</h5>
+      <h5> MAX PRICE {{d['max_price']}}</h5>
+
+      <hr>
+    {% endfor %}
+    {% endif %}
+    
+</form>
+{% endblock %}
